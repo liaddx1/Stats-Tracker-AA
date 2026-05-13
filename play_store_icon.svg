@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-strong" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="outer-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <radialGradient id="bg-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0d1526"/>
+      <stop offset="70%" stop-color="#080e1a"/>
+      <stop offset="100%" stop-color="#020508"/>
+    </radialGradient>
+    <radialGradient id="inner-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0a1929" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#030a12" stop-opacity="1"/>
+    </radialGradient>
+    <radialGradient id="needle-grad" cx="50%" cy="100%" r="100%">
+      <stop offset="0%" stop-color="#ff2d6f"/>
+      <stop offset="100%" stop-color="#ff6090"/>
+    </radialGradient>
+    <linearGradient id="arc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00ffe0"/>
+      <stop offset="50%" stop-color="#00cfff"/>
+      <stop offset="100%" stop-color="#ff2d6f"/>
+    </linearGradient>
+    <linearGradient id="speed-text-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ffe0"/>
+      <stop offset="100%" stop-color="#00bfff"/>
+    </linearGradient>
+
+    <clipPath id="icon-clip">
+      <rect x="0" y="0" width="512" height="512" rx="80" ry="80"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#icon-clip)">
+    <rect width="512" height="512" fill="url(#bg-grad)"/>
+
+    <g opacity="0.08" stroke="#00ffe0" stroke-width="0.8">
+      <line x1="64" y1="0" x2="64" y2="512"/>
+      <line x1="128" y1="0" x2="128" y2="512"/>
+      <line x1="192" y1="0" x2="192" y2="512"/>
+      <line x1="256" y1="0" x2="256" y2="512"/>
+      <line x1="320" y1="0" x2="320" y2="512"/>
+      <line x1="384" y1="0" x2="384" y2="512"/>
+      <line x1="448" y1="0" x2="448" y2="512"/>
+      <line x1="0" y1="64" x2="512" y2="64"/>
+      <line x1="0" y1="128" x2="512" y2="128"/>
+      <line x1="0" y1="192" x2="512" y2="192"/>
+      <line x1="0" y1="256" x2="512" y2="256"/>
+      <line x1="0" y1="320" x2="512" y2="320"/>
+      <line x1="0" y1="384" x2="512" y2="384"/>
+      <line x1="0" y1="448" x2="512" y2="448"/>
+    </g>
+
+    <circle cx="256" cy="256" r="210" fill="none" stroke="#00ffe0" stroke-width="1.5" opacity="0.25" filter="url(#glow-soft)"/>
+    <circle cx="256" cy="256" r="210" fill="none" stroke="#00ffe0" stroke-width="0.5" opacity="0.6"/>
+
+    <circle cx="256" cy="256" r="196" fill="none" stroke="#0a2a3a" stroke-width="12"/>
+    <circle cx="256" cy="256" r="196" fill="none" stroke="#00ffe0" stroke-width="2" opacity="0.5" filter="url(#glow-cyan)"/>
+
+    <circle cx="256" cy="256" r="184" fill="url(#inner-bg)"/>
+
+    <g stroke="#00ffe0" stroke-linecap="round" stroke-width="3" filter="url(#glow-soft)" opacity="0.9">
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(-120, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(-90, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(-60, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(-30, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(0, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(30, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(60, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(90, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="78" transform="rotate(120, 256, 256)"/>
+    </g>
+
+    <g stroke="#00ffe0" stroke-width="1.2" opacity="0.4">
+      <line x1="256" y1="98" x2="256" y2="86" transform="rotate(-105, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="86" transform="rotate(-75, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="86" transform="rotate(-45, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="86" transform="rotate(-15, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="86" transform="rotate(15, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="86" transform="rotate(45, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="86" transform="rotate(75, 256, 256)"/>
+      <line x1="256" y1="98" x2="256" y2="86" transform="rotate(105, 256, 256)"/>
+    </g>
+
+    <path d="M 110.5 340 A 168 168 0 0 1 401.5 172"
+          fill="none"
+          stroke="url(#arc-grad)"
+          stroke-width="6"
+          stroke-linecap="round"
+          filter="url(#glow-cyan)"
+          opacity="0.9"/>
+
+    <path d="M 110.5 340 A 168 168 0 0 1 401.5 172"
+          fill="none"
+          stroke="#00ffe0"
+          stroke-width="2"
+          stroke-linecap="round"
+          opacity="0.3"/>
+
+    <g transform="rotate(60, 256, 256)" filter="url(#glow-strong)">
+      <polygon points="256,100 248,258 256,270 264,258" fill="url(#needle-grad)" opacity="0.95"/>
+      <polygon points="256,270 250,295 256,300 262,295" fill="#ff2d6f" opacity="0.7"/>
+    </g>
+
+    <circle cx="256" cy="256" r="18" fill="#0a1929" stroke="#00ffe0" stroke-width="2" filter="url(#glow-soft)"/>
+    <circle cx="256" cy="256" r="10" fill="#ff2d6f" filter="url(#glow-strong)" opacity="0.9"/>
+    <circle cx="256" cy="256" r="5"  fill="#ffaacc"/>
+
+    <rect x="186" y="310" width="140" height="52" rx="8"
+          fill="#030a12" stroke="#00ffe0" stroke-width="1.5" opacity="0.9"/>
+    <rect x="186" y="310" width="140" height="52" rx="8"
+          fill="none" stroke="#00ffe0" stroke-width="1" filter="url(#glow-soft)" opacity="0.5"/>
+
+    <text x="256" y="348"
+          font-family="'Courier New', Courier, monospace"
+          font-size="30"
+          font-weight="bold"
+          fill="url(#speed-text-grad)"
+          text-anchor="middle"
+          filter="url(#glow-cyan)"
+          letter-spacing="2">247</text>
+
+    <text x="256" y="375"
+          font-family="'Courier New', Courier, monospace"
+          font-size="11"
+          fill="#00ffe0"
+          text-anchor="middle"
+          opacity="0.7"
+          letter-spacing="4">KM/H</text>
+
+    <text x="256" y="405"
+          font-family="'Courier New', Courier, monospace"
+          font-size="18"
+          font-weight="bold"
+          fill="#00ffe0"
+          text-anchor="middle"
+          filter="url(#glow-soft)"
+          letter-spacing="6"
+          opacity="0.85">Stats Tracker</text>
+
+    <g stroke="#00ffe0" stroke-width="2" fill="none" opacity="0.4">
+      <path d="M 36 36 L 36 72 M 36 36 L 72 36"/>
+      <path d="M 476 36 L 476 72 M 476 36 L 440 36"/>
+      <path d="M 36 476 L 36 440 M 36 476 L 72 476"/>
+      <path d="M 476 476 L 476 440 M 476 476 L 440 476"/>
+    </g>
+
+    <line x1="176" y1="56" x2="336" y2="56"
+          stroke="#00ffe0" stroke-width="1" opacity="0.3" filter="url(#glow-soft)"/>
+
+    <rect width="512" height="512" fill="url(#scanlines)" opacity="0.03"/>
+  </g>
+</svg>

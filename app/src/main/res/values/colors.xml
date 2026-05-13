@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="cyber_bg">#FF050810</color>
+    <color name="cyber_grid">#FF0F2030</color>
+    <color name="cyber_cyan">#FF00F0FF</color>
+    <color name="cyber_magenta">#FFFF2A6D</color>
+    <color name="cyber_yellow">#FFF7E96B</color>
+    <color name="ic_launcher_background">#FF050810</color>
+</resources>

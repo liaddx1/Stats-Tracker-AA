@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Stats Tracker</string>
+    <string name="tracking_notification_title">Stats Tracker</string>
+    <string name="tracking_notification_text">Recording trip stats</string>
+    <string name="tracking_notification_stop">Stop</string>
+    <string name="tracking_channel_name">Trip tracking</string>
+    <string name="tracking_channel_description">Keeps recording speed and distance while the screen is off or the app is in the background</string>
+</resources>

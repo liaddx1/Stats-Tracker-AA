@@ -46,7 +46,9 @@ fun SetupScreen(onGrantLocation: () -> Unit) {
 
         SectionHeader("Location access required")
         Text(
-            "Speed comes from GPS. Grant precise location to start the speedometer.",
+            "Speed comes from GPS. Grant precise location to start the speedometer. " +
+                "Choose \"Allow all the time\" so the app keeps tracking when your phone " +
+                "screen is locked in the car.",
             color = DimText, fontSize = 14.sp
         )
         CyberButton(text = "GRANT LOCATION", onClick = onGrantLocation)

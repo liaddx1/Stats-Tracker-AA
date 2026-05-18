@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.liad.statstracker.R
 import com.liad.statstracker.data.LocationProvider
@@ -34,7 +35,10 @@ class TripService : Service() {
     override fun onCreate() {
         super.onCreate()
         ensureChannel()
-        startForegroundWithNotification()
+        if (!startForegroundWithNotification()) {
+            stopSelf()
+            return
+        }
         TripStatsRepository.get(this)
         PerformanceRepository.get(this)
         locationJob = scope.launch {
@@ -61,7 +65,7 @@ class TripService : Service() {
         super.onDestroy()
     }
 
-    private fun startForegroundWithNotification() {
+    private fun startForegroundWithNotification(): Boolean {
         val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         val openIntent = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java), flags,
@@ -82,10 +86,20 @@ class TripService : Service() {
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIFICATION_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
-        } else {
-            startForeground(NOTIFICATION_ID, notif)
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(NOTIFICATION_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+            } else {
+                startForeground(NOTIFICATION_ID, notif)
+            }
+            true
+        } catch (e: Exception) {
+            // Locked-phone start from Car App session on API 34+ can throw
+            // ForegroundServiceStartNotAllowedException / SecurityException when
+            // ACCESS_BACKGROUND_LOCATION isn't granted. Fail soft so the process
+            // stays alive — the Car session UI will show "no GPS" instead of crashing.
+            Log.w(TAG, "startForeground rejected; service will stop", e)
+            false
         }
     }
 
@@ -105,6 +119,7 @@ class TripService : Service() {
     }
 
     companion object {
+        private const val TAG = "TripService"
         private const val CHANNEL_ID = "trip_tracking"
         private const val NOTIFICATION_ID = 1001
         const val ACTION_STOP = "com.liad.statstracker.action.STOP"
@@ -113,8 +128,13 @@ class TripService : Service() {
             val intent = Intent(context, TripService::class.java)
             try {
                 context.startForegroundService(intent)
-            } catch (_: Exception) {
-                context.startService(intent)
+            } catch (e: Exception) {
+                Log.w(TAG, "startForegroundService failed", e)
+                try {
+                    context.startService(intent)
+                } catch (e2: Exception) {
+                    Log.w(TAG, "startService fallback failed", e2)
+                }
             }
         }
     }

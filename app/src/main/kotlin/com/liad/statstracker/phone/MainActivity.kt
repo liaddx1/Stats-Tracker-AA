@@ -54,6 +54,9 @@ class MainActivity : ComponentActivity() {
         val notificationLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { }
+        val backgroundLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { }
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { granted ->
@@ -62,6 +65,9 @@ class MainActivity : ComponentActivity() {
                 TripService.start(this)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !hasBackgroundLocation()) {
+                    backgroundLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
                 }
             }
         }
@@ -138,4 +144,10 @@ class MainActivity : ComponentActivity() {
         ContextCompat.checkSelfPermission(
             this, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
+
+    private fun hasBackgroundLocation(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 }

@@ -1,7 +1,8 @@
 package com.liad.statstracker.car
 
 import android.graphics.Rect
-import android.view.Choreographer
+import android.os.Handler
+import android.os.Looper
 import android.view.Surface
 import androidx.car.app.AppManager
 import androidx.car.app.CarContext
@@ -59,7 +60,7 @@ class SpeedSurfaceRenderer(
 
     private val lifecycle = lifecycle
     private val animator = SpeedAnimator()
-    private val choreographer = Choreographer.getInstance()
+    private val frameHandler = Handler(Looper.getMainLooper())
 
     private var surface: Surface? = null
     @Volatile private var stableArea: Rect? = null
@@ -70,17 +71,23 @@ class SpeedSurfaceRenderer(
     private var lastFrameNs: Long = 0
     private var running = false
 
-    private val frameCallback = object : Choreographer.FrameCallback {
-        override fun doFrame(frameTimeNanos: Long) {
+    // Driven by a main-thread Handler rather than Choreographer. Choreographer
+    // frame callbacks are tied to the phone display's VSYNC and stop firing once
+    // the phone screen turns off (locks), which froze the car surface on its last
+    // frame. The main Looper keeps delivering delayed messages with the screen
+    // off, so the car surface keeps rendering while the phone is locked.
+    private val frameRunnable = object : Runnable {
+        override fun run() {
             if (!running) return
-            if (isMenuVisible && frameTimeNanos > menuHideAtNs) {
+            val nowNs = System.nanoTime()
+            if (isMenuVisible && nowNs > menuHideAtNs) {
                 hideMenu()
             }
-            val rawDt = if (lastFrameNs == 0L) 0f else (frameTimeNanos - lastFrameNs) / 1_000_000_000f
-            lastFrameNs = frameTimeNanos
+            val rawDt = if (lastFrameNs == 0L) 0f else (nowNs - lastFrameNs) / 1_000_000_000f
+            lastFrameNs = nowNs
             val dt = if (rawDt > 0.1f) 0f else rawDt
             drawFrame(animator.tick(dt))
-            choreographer.postFrameCallback(this)
+            frameHandler.postDelayed(this, FRAME_INTERVAL_MS)
         }
     }
 
@@ -119,17 +126,18 @@ class SpeedSurfaceRenderer(
     override fun onResume(owner: LifecycleOwner) {
         running = true
         lastFrameNs = 0
-        choreographer.postFrameCallback(frameCallback)
+        frameHandler.removeCallbacks(frameRunnable)
+        frameHandler.post(frameRunnable)
     }
 
     override fun onPause(owner: LifecycleOwner) {
         running = false
-        choreographer.removeFrameCallback(frameCallback)
+        frameHandler.removeCallbacks(frameRunnable)
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
         running = false
-        choreographer.removeFrameCallback(frameCallback)
+        frameHandler.removeCallbacks(frameRunnable)
         speedJob?.cancel()
         sensorJob?.cancel()
         availJob?.cancel()
@@ -168,5 +176,6 @@ class SpeedSurfaceRenderer(
 
     private companion object {
         const val MENU_VISIBLE_DURATION_NS = 5_000_000_000L
+        const val FRAME_INTERVAL_MS = 16L
     }
 }

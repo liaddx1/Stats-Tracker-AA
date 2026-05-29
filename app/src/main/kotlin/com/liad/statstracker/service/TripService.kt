@@ -1,5 +1,6 @@
 package com.liad.statstracker.service
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -7,7 +8,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -35,7 +35,12 @@ class TripService : Service() {
     override fun onCreate() {
         super.onCreate()
         ensureChannel()
-        if (!startForegroundWithNotification()) {
+        if (!promoteToForeground()) {
+            // Couldn't become a foreground service at all. Clear any foreground
+            // state and stop cleanly so the startForegroundService() contract is
+            // satisfied and the framework doesn't kill the process with
+            // "did not then call Service.startForeground()".
+            stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
             return
         }
@@ -65,7 +70,31 @@ class TripService : Service() {
         super.onDestroy()
     }
 
-    private fun startForegroundWithNotification(): Boolean {
+    private fun promoteToForeground(): Boolean {
+        val notif = buildNotification()
+        // Preferred: the "location" type keeps GPS flowing while the phone screen
+        // is off — but the system only allows starting it from the background (a
+        // locked phone) when location access is valid there, i.e. the user chose
+        // "Allow all the time". Otherwise startForeground throws
+        // ForegroundServiceStartNotAllowedException / SecurityException on API 34+.
+        if (tryStartForeground(notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)) return true
+        // Fall back to a non-restricted type purely to satisfy the
+        // startForegroundService() contract so the process stays alive instead of
+        // crashing. Background GPS is unavailable in this mode (the Car UI shows
+        // "no GPS") until the user grants background location.
+        Log.w(TAG, "location FGS rejected; falling back to dataSync (no background GPS)")
+        return tryStartForeground(notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+    }
+
+    private fun tryStartForeground(notif: Notification, type: Int): Boolean = try {
+        startForeground(NOTIFICATION_ID, notif, type)
+        true
+    } catch (e: Exception) {
+        Log.w(TAG, "startForeground(type=$type) rejected", e)
+        false
+    }
+
+    private fun buildNotification(): Notification {
         val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         val openIntent = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java), flags,
@@ -75,7 +104,7 @@ class TripService : Service() {
             Intent(this, TripService::class.java).setAction(ACTION_STOP),
             flags,
         )
-        val notif = NotificationCompat.Builder(this, CHANNEL_ID)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.tracking_notification_title))
             .setContentText(getString(R.string.tracking_notification_text))
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -85,22 +114,6 @@ class TripService : Service() {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
-
-        return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(NOTIFICATION_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
-            } else {
-                startForeground(NOTIFICATION_ID, notif)
-            }
-            true
-        } catch (e: Exception) {
-            // Locked-phone start from Car App session on API 34+ can throw
-            // ForegroundServiceStartNotAllowedException / SecurityException when
-            // ACCESS_BACKGROUND_LOCATION isn't granted. Fail soft so the process
-            // stays alive — the Car session UI will show "no GPS" instead of crashing.
-            Log.w(TAG, "startForeground rejected; service will stop", e)
-            false
-        }
     }
 
     private fun ensureChannel() {
